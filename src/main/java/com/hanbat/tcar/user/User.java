@@ -8,7 +8,7 @@ import org.hibernate.annotations.NaturalId;
 @Getter
 @Setter
 @Entity
-public class Users {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 기본 ID
