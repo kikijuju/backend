@@ -1,13 +1,15 @@
 package com.hanbat.tcar.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED) //기본 생성자를 protected로 설정하기
+@AllArgsConstructor
 @Getter
-@Setter
 @Entity
+@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,6 +21,7 @@ public class User {
     private String email; //유저 이메일 , 아이디로 사용
 
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password; //비밀번호
 
