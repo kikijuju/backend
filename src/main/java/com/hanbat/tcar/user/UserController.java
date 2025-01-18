@@ -3,8 +3,10 @@ package com.hanbat.tcar.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/users/")
@@ -14,10 +16,20 @@ public class UserController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@RequestBody UserSignupDto userSignupDto){
-        String result = userService.signUp(userSignupDto);
+    public ResponseEntity<UserSignupResponseDto> signUp(@RequestBody UserSignupRequestDto userSignupRequestDto){
+        try{
+            User user = userService.signUp(userSignupRequestDto);
+            UserSignupResponseDto userSignupResponseDto = UserSignupResponseDto.builder()
+                    .message("회원가입이 완료되었습니다")
+                    .build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(userSignupResponseDto);
 
-        //TODO 만약에 회원가입 실패했다면? 예외처리 작성하기
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        } catch(ResponseStatusException e){
+            UserSignupResponseDto userSignupResponseDto = UserSignupResponseDto.builder()
+                    .message(e.getReason())
+                    .build();
+            return ResponseEntity.status(e.getStatusCode()).body(userSignupResponseDto);
+        }
     }
 }
+
