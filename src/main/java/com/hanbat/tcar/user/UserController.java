@@ -50,7 +50,6 @@ public class UserController {
         try{
             User user = userService.userFind(userLoginRequestDto);
 
-            //TODO : JWT 발급
             JWToken token = jwtGenerator.generateToken(user);
 
             UserLoginResponseDto userLoginResponseDto = UserLoginResponseDto.builder()
