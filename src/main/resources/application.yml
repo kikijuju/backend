@@ -14,3 +14,7 @@ spring:
       show_sql: true
       format_sql: true
     database-platform: org.hibernate.dialect.MySQLDialect
+
+jwt:
+  secret:
+    key: ${JWT_secret_key}

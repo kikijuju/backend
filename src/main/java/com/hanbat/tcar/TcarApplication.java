@@ -14,6 +14,7 @@ public class TcarApplication {
 		System.setProperty("DB_url", dotenv.get("DB_url"));
 		System.setProperty("DB_username", dotenv.get("DB_username"));
 		System.setProperty("DB_password", dotenv.get("DB_password"));
+		System.setProperty("JWT_secret_key", dotenv.get("JWT_secret_key"));
 
 		SpringApplication.run(TcarApplication.class, args);
 	}
