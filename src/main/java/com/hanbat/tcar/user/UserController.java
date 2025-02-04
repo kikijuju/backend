@@ -1,5 +1,7 @@
 package com.hanbat.tcar.user;
 
+import com.hanbat.tcar.common.JWToken;
+import com.hanbat.tcar.common.JwtGenerator;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,6 +21,7 @@ import java.util.Optional;
 
 public class UserController {
     private final UserService userService;
+    private final JwtGenerator jwtGenerator;
 
     @Tag(name="signup", description="회원가입")
     @PostMapping("/signup")
@@ -48,10 +51,11 @@ public class UserController {
             User user = userService.userFind(userLoginRequestDto);
 
             //TODO : JWT 발급
+            JWToken token = jwtGenerator.generateToken(user);
 
             UserLoginResponseDto userLoginResponseDto = UserLoginResponseDto.builder()
-                    .accessToken("test") //TODO : 액세스 토큰 및 리프레시 토큰
-                    .refreshToken("test")
+                    .accessToken(token.getAccessToken())
+                    .refreshToken(token.getRefreshToken())
                     .build();
             return ResponseEntity.status(HttpStatus.OK).body(userLoginResponseDto);
         } catch (ResponseStatusException e){
