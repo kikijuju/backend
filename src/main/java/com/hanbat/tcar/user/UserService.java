@@ -39,5 +39,22 @@ public class UserService {
 
     }
 
+    public User userFind(UserLoginRequestDto userLoginRequestDto){
+        //이메일 먼저 존재하는지 확인
+        Optional<User> findUser  = userRepository.findByEmail(userLoginRequestDto.getEmail());
+        if(findUser.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "아이디 또는 비밀번호가 일치하지 않습니다");
+        }
+
+        User user = findUser.get();
+        // 비밀번호 일치하는 지 확인
+        if (!passwordEncoder.matches(userLoginRequestDto.getPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "아이디 또는 비밀번호가 일치하지 않습니다");
+        }
+
+        return user;
+
+    }
+
 
 }
