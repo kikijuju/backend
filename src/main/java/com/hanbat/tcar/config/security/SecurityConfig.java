@@ -1,5 +1,6 @@
 package com.hanbat.tcar.config.security;
 
+import com.hanbat.tcar.common.JwtProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -20,25 +22,30 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final JwtProvider jwtProvider;
+
+    public SecurityConfig(JwtProvider jwtProvider) {
+        this.jwtProvider = jwtProvider;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // 람다 스타일로 CORS 설정 활성화 (withDefaults() 사용)
                 .cors(withDefaults())
-                // CSRF 설정 (모든 경로에 대해 CSRF 무시)
                 .csrf(csrf -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/**")))
-                // 모든 요청에 대해 인증 없이 접근 허용
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(new AntPathRequestMatcher("/**")).permitAll());
+                        .requestMatchers(new AntPathRequestMatcher("/api/users/signup"), new AntPathRequestMatcher("/api/users/login"))
+                        .permitAll() // 로그인, 회원가입은 인증 없이 가능
+                        .anyRequest().authenticated() // 그 외 모든 요청은 인증 필요
+                )
+                .addFilterBefore(new JwtFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class); // JWT 필터 추가
 
         return http.build();
     }
 
-    // 모든 CORS 요청을 허용하는 CorsConfigurationSource 빈
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // allowCredentials(true)를 사용하는 경우 '*' 대신 AllowedOriginPatterns 사용
         configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));

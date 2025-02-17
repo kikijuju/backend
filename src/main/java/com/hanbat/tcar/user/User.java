@@ -10,6 +10,7 @@ import org.hibernate.annotations.NaturalId;
 @Getter
 @Entity
 @Builder
+@Table(name = "user") // 테이블 이름 명확히 지정
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

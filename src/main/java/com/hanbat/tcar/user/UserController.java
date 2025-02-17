@@ -2,22 +2,20 @@ package com.hanbat.tcar.user;
 
 import com.hanbat.tcar.common.JWToken;
 import com.hanbat.tcar.common.JwtGenerator;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
 
 @RestController
-@RequestMapping("api/users/")
+@RequestMapping("/api/users/")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://192.168.1.48:3000")
+//@CrossOrigin(origins = "http://192.168.1.48:3000")
 
 public class UserController {
     private final UserService userService;
@@ -63,7 +61,19 @@ public class UserController {
                     .build();
             return ResponseEntity.status(e.getStatusCode()).body(userLoginFailureResponseDto);
         }
-
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<String> getMyEmail(Authentication authentication) {
+        if (authentication == null) {
+            // 토큰이 없거나 유효하지 않아 인증에 실패한 경우
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("인증 실패: 토큰이 없습니다 or 잘못되었습니다.");
+        }
+        // JwtFilter 에서 principal 에 email 을 넣었다면 여기서 꺼낼 수 있음
+        String email = (String) authentication.getPrincipal();
+        return ResponseEntity.ok("인증된 사용자 이메일: " + email);
+    }
+
 }
 
