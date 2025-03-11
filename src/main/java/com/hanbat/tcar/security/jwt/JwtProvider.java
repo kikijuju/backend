@@ -1,4 +1,4 @@
-package com.hanbat.tcar.common;
+package com.hanbat.tcar.security.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;

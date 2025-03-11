@@ -2,12 +2,15 @@ spring:
   config:
     import: optional:file:.env[.properties]
   application:
-    name: ${DB_name}
+    # "DB_name" 대신, 일반 문자열로 지정 (테스트 시 편함)
+    name: tcar
+
   datasource:
     driver-class-name: ${DB_driver}
     url: ${DB_url}
     username: ${DB_username}
     password: ${DB_password}
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -15,6 +18,19 @@ spring:
       format_sql: true
     database-platform: org.hibernate.dialect.MySQLDialect
 
+  redis:
+    host: 127.0.0.1
+    port: 6379
+
+    # password: my_redis_password  # (비밀번호가 있다면)
+
 jwt:
   secret:
     key: ${JWT_secret_key}
+
+external:
+  container:
+    ip: ${container_ip}
+
+pre-signed:
+  url: ${pre_signed_url}

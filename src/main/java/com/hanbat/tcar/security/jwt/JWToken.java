@@ -1,4 +1,4 @@
-package com.hanbat.tcar.common;
+package com.hanbat.tcar.security.jwt;
 
 import lombok.Builder;
 import lombok.Data;

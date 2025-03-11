@@ -1,4 +1,5 @@
-package com.hanbat.tcar.user;
+package com.hanbat.tcar.user.dto;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserLoginResponseDto {
-    private String accessToken;
-    private String refreshToken;
+public class UserLoginRequestDto {
+    private String email;
+    private String password;
 }

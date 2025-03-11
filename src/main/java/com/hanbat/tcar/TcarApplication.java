@@ -2,7 +2,6 @@ package com.hanbat.tcar;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 import io.github.cdimascio.dotenv.Dotenv;
 
 @SpringBootApplication
@@ -15,6 +14,9 @@ public class TcarApplication {
 		System.setProperty("DB_username", dotenv.get("DB_username"));
 		System.setProperty("DB_password", dotenv.get("DB_password"));
 		System.setProperty("JWT_secret_key", dotenv.get("JWT_secret_key"));
+		System.setProperty("pre_signed_url", dotenv.get("pre_signed_url"));
+		System.setProperty("container_ip", dotenv.get("container_ip"));
+
 
 		SpringApplication.run(TcarApplication.class, args);
 	}

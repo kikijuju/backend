@@ -1,5 +1,4 @@
-package com.hanbat.tcar.user;
-
+package com.hanbat.tcar.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserLoginRequestDto {
-    private String email;
-    private String password;
+public class PreSignedUrlResponseDto {
+    private String preSignedUrl;
+    private String message;
 }

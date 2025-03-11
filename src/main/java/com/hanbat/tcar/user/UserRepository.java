@@ -1,5 +1,6 @@
 package com.hanbat.tcar.user;
 
+import com.hanbat.tcar.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

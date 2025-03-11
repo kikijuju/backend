@@ -1,4 +1,4 @@
-package com.hanbat.tcar.user;
+package com.hanbat.tcar.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -20,6 +20,7 @@ public class User {
     @NaturalId
     @Column(nullable = false, unique=true)
     private String email; //유저 이메일 , 아이디로 사용
+
 
 
     @JsonIgnore

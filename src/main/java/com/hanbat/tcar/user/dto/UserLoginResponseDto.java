@@ -1,5 +1,4 @@
-package com.hanbat.tcar.user;
-
+package com.hanbat.tcar.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserSignupResponseDto {
-    private String message; //서버의 메시지 (ex - 회원가입이 완료되었습니다)
+public class UserLoginResponseDto {
+    private String accessToken;
+    private String refreshToken;
 }

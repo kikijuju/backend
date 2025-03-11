@@ -1,4 +1,4 @@
-package com.hanbat.tcar.user;
+package com.hanbat.tcar.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
