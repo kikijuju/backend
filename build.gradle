@@ -49,6 +49,10 @@ dependencies {
 
 	//redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	//coolsms
+	implementation 'net.nurigo:sdk:4.3.2'
+
 }
 
 tasks.named('test') {

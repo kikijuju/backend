@@ -21,8 +21,6 @@ public class User {
     @Column(nullable = false, unique=true)
     private String email; //유저 이메일 , 아이디로 사용
 
-
-
     @JsonIgnore
     @Column(nullable = false)
     private String password; //비밀번호

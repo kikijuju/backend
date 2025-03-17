@@ -34,17 +34,16 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<SimpleMessageResponseDto> signUp(@RequestBody UserSignupRequestDto userSignupRequestDto) {
         try {
-            User user = userService.signUp(userSignupRequestDto);
-            SimpleMessageResponseDto simpleMessageResponseDto = SimpleMessageResponseDto.builder()
+            userService.signUp(userSignupRequestDto);
+            SimpleMessageResponseDto responseDto = SimpleMessageResponseDto.builder()
                     .message("회원가입이 완료되었습니다")
                     .build();
-            return ResponseEntity.status(HttpStatus.CREATED).body(simpleMessageResponseDto);
-
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
         } catch (ResponseStatusException e) {
-            SimpleMessageResponseDto simpleMessageResponseDto = SimpleMessageResponseDto.builder()
+            SimpleMessageResponseDto responseDto = SimpleMessageResponseDto.builder()
                     .message(e.getReason())
                     .build();
-            return ResponseEntity.status(e.getStatusCode()).body(simpleMessageResponseDto);
+            return ResponseEntity.status(e.getStatusCode()).body(responseDto);
         }
     }
 

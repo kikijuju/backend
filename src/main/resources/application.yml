@@ -21,8 +21,13 @@ spring:
   redis:
     host: 127.0.0.1
     port: 6379
-
     # password: my_redis_password  # (비밀번호가 있다면)
+
+coolsms:
+  api:
+    key: ${coolsms_key}
+    secret: ${coolsms_secret_key}
+    fromnum: ${fromnum}
 
 jwt:
   secret:
@@ -34,3 +39,4 @@ external:
 
 pre-signed:
   url: ${pre_signed_url}
+

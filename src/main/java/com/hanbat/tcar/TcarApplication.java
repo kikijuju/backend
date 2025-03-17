@@ -16,6 +16,9 @@ public class TcarApplication {
 		System.setProperty("JWT_secret_key", dotenv.get("JWT_secret_key"));
 		System.setProperty("pre_signed_url", dotenv.get("pre_signed_url"));
 		System.setProperty("container_ip", dotenv.get("container_ip"));
+		System.setProperty("coolsms_key", dotenv.get("coolsms_key"));
+		System.setProperty("coolsms_secret_key", dotenv.get("coolsms_secret_key"));
+		System.setProperty("fromnum", dotenv.get("fromnum"));
 
 
 		SpringApplication.run(TcarApplication.class, args);
