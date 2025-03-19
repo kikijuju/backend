@@ -1,7 +1,10 @@
-package com.hanbat.tcar.sms;
+package com.hanbat.tcar.sms.controller;
 
+import com.hanbat.tcar.sms.dto.SingleResponseDto;
 import com.hanbat.tcar.sms.dto.SmsRequest;
 import com.hanbat.tcar.sms.dto.SmsVerifyRequest;
+import com.hanbat.tcar.sms.service.SmsUtil;
+import com.hanbat.tcar.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,24 +16,23 @@ import org.springframework.web.bind.annotation.*;
 public class SmsController {
 
     private final SmsUtil smsUtil;
+    private final UserService userService;
 
-    /**
-     * 프론트엔드에서 전화번호를 받아 SMS 인증번호를 전송하는 API
-     */
+
+    // SMS 인증번호 전송
     @PostMapping("/send")
-    public ResponseEntity<String> sendSms(@RequestBody SmsRequest smsRequest) {
+    public ResponseEntity<SingleResponseDto<String>> sendSms(@RequestBody SmsRequest smsRequest) {
         try {
+            userService.checkDuplicatedPhoneNumber(smsRequest.getPhoneNumber());
             smsUtil.sendCertificationSMS(smsRequest.getPhoneNumber());
-            return ResponseEntity.ok("인증번호 전송 완료");
+            return new ResponseEntity<>(new SingleResponseDto<>("인증번호 전송 완료"), HttpStatus.OK);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("인증번호 전송 실패: " + e.getMessage());
+            return new ResponseEntity<>(new SingleResponseDto<>("인증번호 전송 실패: " + e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    /**
-     * 프론트엔드에서 전화번호와 입력한 인증번호를 받아 검증하는 API
-     */
+    // SMS 인증번호 검증
     @PostMapping("/verify")
     public ResponseEntity<String> verifySms(@RequestBody SmsVerifyRequest smsVerifyRequest) {
         try {
@@ -41,7 +43,7 @@ public class SmsController {
                 return ResponseEntity.ok("인증 성공");
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("인증 실패: 코드가 일치하지 않습니다.");
+                        .body("인증 실패: 인증번호가 일치하지 않습니다.");
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

@@ -53,6 +53,8 @@ dependencies {
 	//coolsms
 	implementation 'net.nurigo:sdk:4.3.2'
 
+	implementation 'org.springframework.boot:spring-boot-starter-mail' //mail service
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 }
 
 tasks.named('test') {

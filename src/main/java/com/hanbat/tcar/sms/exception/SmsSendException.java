@@ -1,4 +1,4 @@
-package com.hanbat.tcar.sms;
+package com.hanbat.tcar.sms.exception;
 
 
 public class SmsSendException extends RuntimeException {

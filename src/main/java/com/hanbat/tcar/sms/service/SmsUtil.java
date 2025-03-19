@@ -1,6 +1,6 @@
-package com.hanbat.tcar.sms;
+package com.hanbat.tcar.sms.service;
 
-import com.hanbat.tcar.sms.SmsSendException;
+import com.hanbat.tcar.sms.exception.SmsSendException;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

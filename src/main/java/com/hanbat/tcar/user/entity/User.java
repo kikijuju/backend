@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
+import java.time.LocalDate;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED) //기본 생성자를 protected로 설정하기
 @AllArgsConstructor
 @Getter
@@ -34,5 +36,16 @@ public class User {
 
     @Column(nullable = false, unique = true, length=32)
     private String nickname; // 사용자 닉네임
+
+
+    @Column(nullable = false)
+    private String phoneNumber; // 휴대폰 번호
+
+    @Column(nullable = false)
+    private LocalDate birthDate; // 생년월일
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Gender gender; // 성별
 
 }
