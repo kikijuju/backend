@@ -19,9 +19,12 @@ public class TcarApplication {
 		System.setProperty("coolsms_key", dotenv.get("coolsms_key"));
 		System.setProperty("coolsms_secret_key", dotenv.get("coolsms_secret_key"));
 		System.setProperty("fromnum", dotenv.get("fromnum"));
+		System.setProperty("REDIS_HOST", dotenv.get("REDIS_HOST"));
+		System.setProperty("REDIS_PORT", dotenv.get("REDIS_PORT"));
+		System.setProperty("MAIL_USERNAME", dotenv.get("MAIL_USERNAME"));
+		System.setProperty("MAIL_PASSWORD", dotenv.get("MAIL_PASSWORD"));
 
 
 		SpringApplication.run(TcarApplication.class, args);
 	}
-
 }

@@ -1,6 +1,6 @@
-package com.hanbat.tcar.security;
+package com.hanbat.tcar.auth;
 
-import com.hanbat.tcar.security.jwt.JwtProvider;
+import com.hanbat.tcar.auth.jwt.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;

@@ -48,4 +48,17 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Gender gender; // 성별
 
+    // 회원 수정
+    public void updateAccountInfo(String nickname, String username, LocalDate birthDate, Gender gender) {
+        this.nickname = nickname;
+        this.username = username;
+        this.birthDate = birthDate;
+        this.gender = gender;
+    }
+
+    // 비밀번호 변경
+    public void updatePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
 }

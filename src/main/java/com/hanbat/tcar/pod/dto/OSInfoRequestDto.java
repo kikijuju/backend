@@ -1,4 +1,4 @@
-package com.hanbat.tcar.user.dto;
+package com.hanbat.tcar.pod.dto;
 
 
 import lombok.AllArgsConstructor;

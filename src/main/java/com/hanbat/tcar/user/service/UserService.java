@@ -23,13 +23,30 @@ public class UserService {
 
 
     //회원가입 때 DB로 넘어갈 정보
+    @Transactional
     public User signUp(UserSignupRequestDto userSignupRequestDto){
+
+        // 이메일 중복 확인
+        if (userRepository.existsByEmail(userSignupRequestDto.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다.");
+        }
+
+        // 전화번호 중복 확인
+        if (userRepository.existsByPhoneNumber(userSignupRequestDto.getPhoneNumber())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 등록된 전화번호입니다.");
+        }
+
+        // 비밀번호 형식 검증
+        if (!UserService.isValidPasswordFormat(userSignupRequestDto.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "비밀번호 형식이 올바르지 않습니다.");
+        }
+
 
         User user = User.builder()
                 .email(userSignupRequestDto.getEmail())
                 .password(passwordEncoder.encode(userSignupRequestDto.getPassword()))
                 .username(userSignupRequestDto.getUsername())
-                .nickname(userSignupRequestDto.getNickname())
+                .nickname(userSignupRequestDto.getUsername())
                 .phoneNumber(userSignupRequestDto.getPhoneNumber())
                 .birthDate(userSignupRequestDto.getBirthDate())  // LocalDate 타입이어야 함
                 .gender(userSignupRequestDto.getGender())        // Gender enum 값
@@ -75,6 +92,17 @@ public class UserService {
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 사용중인 전화번호입니다.");
         }
+    }
+
+    //이메일 중복확인
+    public boolean isNicknameDuplicate(String nickname) {
+        return userRepository.existsByNickname(nickname);
+    }
+    // 비밀번호
+    public static boolean isValidPasswordFormat(String password) {
+        // 8자 이상, 영문/숫자/특수문자 혼합
+        String regex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=]).{8,}$";
+        return password.matches(regex);
     }
 
 }

@@ -1,9 +1,8 @@
-package com.hanbat.tcar.security.jwt;
+package com.hanbat.tcar.auth.jwt;
 
 import com.hanbat.tcar.user.entity.User;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,14 +76,15 @@ public class JwtGenerator {
     /**
      * 컨테이너 전용(pre-signed URL) 토큰 생성
      */
-    public String generateTokenWithContainerInfo(User user, String containerId, String port) {
+    public String generateTokenWithContainerInfo(User user, String podName, String podNamespace, String ingress) {
         Date now = new Date();
         Date containerTokenExpiry = new Date(now.getTime() + CONTAINER_TOKEN_EXPIRATION);
 
         return Jwts.builder()
                 .subject(user.getEmail())
-                .claim("containerId", containerId)
-                .claim("port", port)
+                .claim("podName", podName)
+                .claim("podNamespace", podNamespace)
+                .claim("ingress", ingress)
                 .issuedAt(now)
                 .expiration(containerTokenExpiry)
                 // 컨테이너 전용 토큰은 CONTAINER_SECRET_KEY 사용

@@ -19,14 +19,14 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
 
   redis:
-    host: 127.0.0.1
-    port: 6379
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
     # password: my_redis_password  # (비밀번호가 있다면)
   mail:
     host: smtp.gmail.com
     port: 587
-    username: juryeong1@gmail.com
-    password: eenkyzowstwkcuzg  # 오타 수정됨
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}  # 오타 수정됨
     properties:
       mail:
         smtp:
@@ -55,4 +55,9 @@ external:
 
 pre-signed:
   url: ${pre_signed_url}
+
+logging:
+  level:
+    root: INFO
+    com.hanbat.tcar: DEBUG  # 또는 INFO
 

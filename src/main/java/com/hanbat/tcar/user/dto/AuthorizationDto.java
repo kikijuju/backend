@@ -9,7 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PreSignedUrlResponseDto {
-    private String preSignedUrl;
-    private String message;
+public class AuthorizationDto {
+    private String message; //서버의 메시지 (ex - 회원가입이 완료되었습니다)
+    private String token;
+
 }
+
+

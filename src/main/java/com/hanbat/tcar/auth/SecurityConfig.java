@@ -1,6 +1,6 @@
-package com.hanbat.tcar.security;
+package com.hanbat.tcar.auth;
 
-import com.hanbat.tcar.security.jwt.JwtProvider;
+import com.hanbat.tcar.auth.jwt.JwtProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,10 +37,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/users/signup",
                                 "/api/users/login",
-                                "/**",
                                 "/api/users/role"
                         ).permitAll()
-                        .anyRequest().authenticated() // 그 외 모든 요청은 인증 필요
+                        .anyRequest().permitAll() // 그 외 모든 요청은 인증 필요
                 )
                 .addFilterBefore(new JwtFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class); // JWT 필터 추가
 
@@ -53,12 +52,15 @@ public class SecurityConfig {
         configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.addExposedHeader("Authorization");
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

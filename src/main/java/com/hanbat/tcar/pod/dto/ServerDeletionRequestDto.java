@@ -1,4 +1,4 @@
-package com.hanbat.tcar.user.dto;
+package com.hanbat.tcar.pod.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContainerDeletionRequestDto {
-    private String containerId;
+public class ServerDeletionRequestDto {
+    private String podNamespace;
+    private String podName;
 }
