@@ -1,5 +1,6 @@
 package com.hanbat.tcar.user.controller;
 
+import com.hanbat.tcar.auth.jwt.JWToken;
 import com.hanbat.tcar.user.UserRepository;
 import com.hanbat.tcar.user.dto.*;
 import com.hanbat.tcar.user.entity.User;
@@ -48,27 +49,30 @@ public class UserController {
         }
     }
 
-    // 로그인
+    /*──────────────────────────────── 로그인 (Variable 방식) ─────────────────*/
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserLoginRequestDto userLoginRequestDto,
-                                   HttpServletResponse response) {
-        // 로그인 요청 전 로그 출력
-        log.info("로그인 요청 시작: 사용자 이메일 = {}", userLoginRequestDto.getEmail());
-        // AuthService에 로그인 로직 위임
-        SimpleMessageResponseDto result = authService.login(userLoginRequestDto, response);
-        // 로그인 결과 로그 출력
-        log.info("로그인 요청 완료: 결과 메시지 = {}", result.getMessage());
-        return ResponseEntity.ok(result);
+    public ResponseEntity<JWToken> login(@RequestBody UserLoginRequestDto userLoginRequestDto) {
+
+        log.info("로그인 요청: {}", userLoginRequestDto.getEmail());
+
+        // ★ AuthService.login() → JWToken(JSON) 반환
+        JWToken tokens = authService.login(userLoginRequestDto);
+
+        log.info("로그인 성공: accessToken 만료 15분");
+
+        return ResponseEntity.ok(tokens);                 // Body = {accessToken, refreshToken}
     }
 
-    // 로그아웃
+    /*──────────────────────────────── 로그아웃 ───────────────────────────────*/
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request,
-                                    HttpServletResponse response) {
-        SimpleMessageResponseDto result = authService.logout(request, response);
-        return ResponseEntity.ok(result);
-    }
+    public ResponseEntity<SimpleMessageResponseDto> logout(
+            @RequestHeader("Refresh-Token") String refreshToken) { // ★ 헤더로 전달
 
+        authService.logout(refreshToken);
+
+        return ResponseEntity.ok(
+                new SimpleMessageResponseDto("로그아웃 완료"));
+    }
 
     @GetMapping("/role")
     public ResponseEntity<UserRoleResponseDto> getUserRole(@RequestParam("email") String email) {

@@ -5,7 +5,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.Cookie; // Cookie import 필요
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,45 +21,33 @@ public class JwtFilter extends GenericFilterBean {
         this.jwtProvider = jwtProvider;
     }
 
-    /**
-     * 쿠키에서 "ACCESS_TOKEN" 쿠키를 찾아서 반환하는 메서드
-     */
-    private String extractAccessTokenFromCookie(HttpServletRequest request) {
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("ACCESS_TOKEN".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String authHeader = httpRequest.getHeader("Authorization");
 
-        // 1) 쿠키에서 ACCESS_TOKEN 추출
-        String token = extractAccessTokenFromCookie(httpRequest);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
 
-        // 2) 토큰 유효성 검증
-        if (token != null && jwtProvider.validateToken(token)) {
-            String email = jwtProvider.getEmailFromToken(token);
+            // 2) 토큰 유효성 검증
+            if (token != null && jwtProvider.validateToken(token)) {
+                String email = jwtProvider.getEmailFromToken(token);
 
-            // 인증 객체 생성
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            email,  // principal
-                            null,   // credentials
-                            Collections.emptyList() // 권한 정보
-                    );
+                // 인증 객체 생성
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                email,  // principal
+                                null,   // credentials
+                                Collections.emptyList() // 권한 정보
+                        );
 
-            // SecurityContextHolder에 인증 정보 설정
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                // SecurityContextHolder에 인증 정보 설정
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
-
         // 3) 다음 필터로 진행
         chain.doFilter(request, response);
     }

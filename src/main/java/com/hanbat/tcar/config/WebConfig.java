@@ -13,6 +13,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedMethods("*")
                 .allowedHeaders("*")
                 .exposedHeaders("Authorization")
-                .allowCredentials(true);  // 이거 없으면 쿠키 전달 안 됨
+                .allowCredentials(false);  // 이거 없으면 쿠키 전달 안 됨
     }
 }
