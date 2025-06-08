@@ -12,5 +12,6 @@ public class PodListInfoDto {
     private String namespace;
     private String status;
     private String ingressUrl;
+    private String calledName;
     private String accessType;
 }

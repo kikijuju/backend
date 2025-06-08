@@ -17,7 +17,7 @@ public class AuthController {
 
     /**
      * Refresh Token을 이용한 Access Token 재발급
-     */
+
     @PostMapping("/refresh")
     public ResponseEntity<JWToken> refresh(
             @RequestHeader("Refresh-Token") String refreshToken) {
@@ -25,7 +25,7 @@ public class AuthController {
         JWToken newTokens = authService.refreshToken(refreshToken);
         return ResponseEntity.ok(newTokens);           // JSON → 프론트 저장
     }
-
+     */
 
     @GetMapping("/validate")
     public ResponseEntity<String> validateToken(Authentication authentication) {

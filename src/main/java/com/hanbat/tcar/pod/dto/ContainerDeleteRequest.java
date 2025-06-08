@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ServerDeletionRequestDto {
+public class ContainerDeleteRequest {
     private String podNamespace;
     private String podName;
 }

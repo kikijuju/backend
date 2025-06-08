@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 public class OSInfoRequestDto {
     private String os;
     private String version;
+    private String serverName;
 }

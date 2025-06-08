@@ -55,6 +55,10 @@ external:
 
 pre-signed:
   url: ${pre_signed_url}
+  protocol: ${PRE_SIGNED_PROTOCOL}
+  host: ${PRE_SIGNED_HOST}
+  port: ${PRE_SIGNED_PORT}
+  context-path: ${PRE_SIGNED_CONTEXT_PATH}
 
 logging:
   level:

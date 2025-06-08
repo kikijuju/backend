@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -49,21 +50,25 @@ public class UserController {
         }
     }
 
-    /*──────────────────────────────── 로그인 (Variable 방식) ─────────────────*/
+    /*────────────────────────── 로그인 (AccessToken 전용) ─────────────────────*/
     @PostMapping("/login")
-    public ResponseEntity<JWToken> login(@RequestBody UserLoginRequestDto userLoginRequestDto) {
+    public ResponseEntity<JWToken> login(
+            @RequestBody UserLoginRequestDto userLoginRequestDto) {
 
         log.info("로그인 요청: {}", userLoginRequestDto.getEmail());
 
-        // ★ AuthService.login() → JWToken(JSON) 반환
+        // ★ AuthService.login() → JWToken(AccessToken만 포함) 반환
         JWToken tokens = authService.login(userLoginRequestDto);
 
-        log.info("로그인 성공: accessToken 만료 15분");
+        log.info("로그인 성공: accessToken 만료 7일");
 
-        return ResponseEntity.ok(tokens);                 // Body = {accessToken, refreshToken}
+        /* refreshToken 필드는 현재 null 또는 포함되지 않음 */
+        return ResponseEntity.ok()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokens)
+                .build();   // Body = { "accessToken": "..." }
     }
 
-    /*──────────────────────────────── 로그아웃 ───────────────────────────────*/
+    /*──────────────────────────────── 로그아웃 ───────────────────────────────
     @PostMapping("/logout")
     public ResponseEntity<SimpleMessageResponseDto> logout(
             @RequestHeader("Refresh-Token") String refreshToken) { // ★ 헤더로 전달
@@ -73,6 +78,7 @@ public class UserController {
         return ResponseEntity.ok(
                 new SimpleMessageResponseDto("로그아웃 완료"));
     }
+    */
 
     @GetMapping("/role")
     public ResponseEntity<UserRoleResponseDto> getUserRole(@RequestParam("email") String email) {

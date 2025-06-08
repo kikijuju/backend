@@ -1,14 +1,16 @@
 package com.hanbat.tcar.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@Component
-public class PreSignedUrlConfig {
-    @Value("${pre-signed.url}")
-    private String preSignedUrl;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
-    public String getPreSignedUrl() {
-        return preSignedUrl;
-    }
+@Data
+@Component
+@ConfigurationProperties(prefix = "pre-signed")
+public class PreSignedUrlConfig {
+    private String protocol;
+    private String host;
+    private String port;
+    private String contextPath;
 }

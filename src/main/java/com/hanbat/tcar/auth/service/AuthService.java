@@ -22,7 +22,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final JwtGenerator jwtGenerator;
-    private final RefreshTokenService refreshTokenService;
+    // private final RefreshTokenService refreshTokenService;
     private final UserService userService;
 
     /* 1) 로그인 ─────────────────────────────────────────────── */
@@ -32,15 +32,15 @@ public class AuthService {
         JWToken token = jwtGenerator.generateToken(user);   // Access / Refresh 생성
 
         // RefreshToken → Redis (7일)
-        refreshTokenService.storeRefreshToken(
-                user.getId(),
-                token.getRefreshToken(),
-                7L);
+       // refreshTokenService.storeRefreshToken(
+       //         user.getId(),
+       //         token.getRefreshToken(),
+        //        7L);
 
         return token;                                       // ★ JSON 그대로 반환
     }
 
-    /* 2) AccessToken 재발급 ─────────────────────────────────── */
+    /* 2) AccessToken 재발급 ───────────────────────────────────
     public JWToken refreshToken(String refreshToken) {
 
         Long uid = refreshTokenService.getUserIdByRefreshToken(refreshToken);
@@ -58,12 +58,14 @@ public class AuthService {
                 newToken.getRefreshToken(),
                 7L);
 
-        return newToken;                                    // ★ JSON
+        return newToken;
     }
-
-    /* 3) 로그아웃 ───────────────────────────────────────────── */
+    3) 로그아웃 ─────────────────────────────────────────────
     public void logout(String refreshToken) {
         if (refreshToken != null)
             refreshTokenService.deleteRefreshToken(refreshToken); // Redis 삭제
     }
+    */
+
+
 }

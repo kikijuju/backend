@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PodInfoResponseDto {
+public class PodInfo {
     private String podName;
     private String podNamespace;
     private String ingress;
