@@ -55,9 +55,13 @@ public class ServerController {
             Authentication auth) {
 
         return withAuth(auth, email -> {
-            log.info("[presign] {}", sel);
+            log.info("[pre-sign] pod={} ns={} ingress={}",
+                    sel.getPodName(), sel.getPodNamespace(), sel.getIngressUrl());
 
-            PreSignedUrlResponseDto dto = preSignedUrlService.generateForExistingContainer(sel, email);
+            // Service 내부에서 sel.getPodName(), sel.getPodNamespace(), sel.getIngressUrl()만 사용
+            PreSignedUrlResponseDto dto =
+                    preSignedUrlService.generateForExistingContainer(sel, email);
+
             HttpStatus status = dto.getPreSignedUrl().isEmpty()
                     ? HttpStatus.BAD_REQUEST
                     : HttpStatus.CREATED;

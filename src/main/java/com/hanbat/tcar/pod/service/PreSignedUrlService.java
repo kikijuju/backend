@@ -83,8 +83,11 @@ public class PreSignedUrlService {
 
         // ③ JWT
         String jwt = jwtGenerator.generateTokenWithContainerInfo(
-                user, sel.getPodName(), sel.getPodNamespace(), sel.getIngressUrl());
-
+                user,
+                sel.getPodName(),
+                sel.getPodNamespace(),
+                sel.getIngressUrl()
+        );
         // ④ Pre-Signed URL
         PodInfo pod = new PodInfo(sel.getPodName(),
                 sel.getPodNamespace(),

@@ -6,14 +6,11 @@ import com.hanbat.tcar.user.dto.*;
 import com.hanbat.tcar.user.entity.User;
 import com.hanbat.tcar.user.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import com.hanbat.tcar.auth.service.AuthService;
@@ -57,15 +54,18 @@ public class UserController {
 
         log.info("로그인 요청: {}", userLoginRequestDto.getEmail());
 
-        // ★ AuthService.login() → JWToken(AccessToken만 포함) 반환
+        // AuthService.login() → accessToken만 담긴 JWToken 반환
         JWToken tokens = authService.login(userLoginRequestDto);
 
         log.info("로그인 성공: accessToken 만료 7일");
 
-        /* refreshToken 필드는 현재 null 또는 포함되지 않음 */
+        // 1) 헤더엔 오직 accessToken 문자열만
+        String bearer = "Bearer " + tokens.getAccessToken();
+
+        // 2) Body엔 필요하면 refreshToken만 내려줄 수도 있고, 아니면 JWToken 전체
         return ResponseEntity.ok()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokens)
-                .build();   // Body = { "accessToken": "..." }
+                .header(HttpHeaders.AUTHORIZATION, bearer)
+                .body(tokens);
     }
 
     /*──────────────────────────────── 로그아웃 ───────────────────────────────
@@ -93,5 +93,4 @@ public class UserController {
         User user = userOpt.get();
         return ResponseEntity.ok(new UserRoleResponseDto(user.getRole().name()));
     }
-
 }
