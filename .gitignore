@@ -43,3 +43,7 @@ out/
 
 ### test ###
 application-test.yml
+
+# Environment
+.env
+src/main/resources/.env
