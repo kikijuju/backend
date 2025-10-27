@@ -17,46 +17,48 @@ public class JwtGenerator {
     private final Key SECRET_KEY;                    // 로그인/인가용 키
     private final Key CONTAINER_SECRET_KEY;          // 컨테이너 전용 키
 
-    private final long ACCESS_TOKEN_EXPIRATION = 1000L * 60 * 60 * 24 * 7; // 7일
-    // private final long REFRESH_TOKEN_EXPIRATION = 1000L * 60 * 60 * 24 * 7; // ❌ 사용 안 함
-    private final long CONTAINER_TOKEN_EXPIRATION = 1000 * 60 * 5;          // 5분
+    // 예시: Access 30분, Refresh 7일 (값은 원하는 대로 조정)
+    private final long ACCESS_TOKEN_EXPIRATION_MS  = 1000L * 60 * 30;         // 30분
+    private final long REFRESH_TOKEN_EXPIRATION_MS = 1000L * 60 * 60 * 24 * 7; // 7일
+    private final long CONTAINER_TOKEN_EXPIRATION  = 1000L * 60 * 5;           // 5분
 
     public JwtGenerator(
             @Value("${jwt.secret.key}") String secretKey,
             @Value("${pre-signed.url}") String containerKey) {
 
-        this.SECRET_KEY          = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+        this.SECRET_KEY           = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
         this.CONTAINER_SECRET_KEY = Keys.hmacShaKeyFor(Decoders.BASE64.decode(containerKey));
     }
 
-    /* ───────────────────────── Access Token만 생성 ───────────────────────── */
+    /* ───────────────────────── Access + Refresh 생성 ───────────────────────── */
     public JWToken generateToken(User user) {
 
-        Date now   = new Date();
-        Date exp   = new Date(now.getTime() + ACCESS_TOKEN_EXPIRATION);
+        Date now = new Date();
 
+        // Access
+        Date accessExp = new Date(now.getTime() + ACCESS_TOKEN_EXPIRATION_MS);
         String accessToken = Jwts.builder()
                 .subject(user.getEmail())
                 .claim("userId",   user.getId())
                 .claim("userName", user.getUsername())
                 .issuedAt(now)
-                .expiration(exp)
+                .expiration(accessExp)
                 .signWith(SECRET_KEY)
                 .compact();
 
-        /* refreshToken 로직 제거/주석 처리
-        Date refreshExp = new Date(now.getTime() + REFRESH_TOKEN_EXPIRATION);
+        // Refresh (payload는 최소화)
+        Date refreshExp = new Date(now.getTime() + REFRESH_TOKEN_EXPIRATION_MS);
         String refreshToken = Jwts.builder()
                 .subject(user.getEmail())
                 .issuedAt(now)
                 .expiration(refreshExp)
                 .signWith(SECRET_KEY)
                 .compact();
-        */
 
         return JWToken.builder()
                 .accessToken(accessToken)
-                // .refreshToken(refreshToken)   // ❌ 더 이상 사용하지 않음
+                .accessTokenExpiresIn(ACCESS_TOKEN_EXPIRATION_MS / 1000) // 초 단위
+                .refreshToken(refreshToken)
                 .build();
     }
 

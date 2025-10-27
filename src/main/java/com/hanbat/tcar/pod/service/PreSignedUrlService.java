@@ -25,7 +25,7 @@ public class PreSignedUrlService {
     private final ExternalPodService externalPodService;
     private final JwtGenerator jwtGenerator;
     private final PreSignedUrlConfig preSignedUrlConfig;
-    private final PreSignedUrlBuilder urlBuilder;   // ★ URL 전담
+    private final PreSignedUrlBuilder urlBuilder;
 
     /* ─────────────────────────────────────────────
      *  새 컨테이너(Pod) 생성 → Pre-Signed URL 발급
@@ -33,43 +33,39 @@ public class PreSignedUrlService {
     public PreSignedUrlResponseDto generateForNewContainer(OSInfoRequestDto req,
                                                            String tokenEmail) {
 
-        // 1) 사용자 조회
         User user = userRepository.findByEmail(tokenEmail)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // 2) 프론트 DTO → 외부 서버 호출 DTO
         ContainerCreateRequest createReq = new ContainerCreateRequest(
-                req.getOs(),            // OS
-                req.getVersion(),       // 버전
-                req.getServerName(),    // calledName (= serverName)
-                tokenEmail              // userEmail
+                req.getOs(),
+                req.getVersion(),
+                req.getServerName(),
+                tokenEmail
         );
 
-        // 3) Pod 생성
         PodInfo pod = externalPodService.createContainer(createReq)
                 .orElseThrow(() -> new IllegalStateException("Failed to retrieve container info"));
 
-        // 4) JWT 생성
         String jwt = jwtGenerator.generateTokenWithContainerInfo(
                 user, pod.getPodName(), pod.getPodNamespace(), pod.getIngress());
 
-        // 5) Pre-Signed URL 조립
         String url = urlBuilder.build(preSignedUrlConfig, jwt, pod);
+
+        log.info("New PresignedURL generated for user={} podName={} namespace={} -> {}",
+                user.getEmail(), pod.getPodName(), pod.getPodNamespace(), url);
 
         return new PreSignedUrlResponseDto(url, "Pre-signed URL generated");
     }
 
     /* ─────────────────────────────────────────────
-     *  2) 기존 Pod 선택 → Pre-Signed URL 발급
+     *  기존 Pod 선택 → Pre-Signed URL 발급
      * ───────────────────────────────────────────── */
     public PreSignedUrlResponseDto generateForExistingContainer(PodSelectionRequestDto sel,
                                                                 String tokenEmail) {
 
-        // ① 사용자 확인
         User user = userRepository.findByEmail(tokenEmail)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // ② 내 Pod 목록 조회
         List<PodListInfoDto> pods = externalPodService.fetchUserPods(tokenEmail);
 
         boolean valid = pods.stream().anyMatch(p ->
@@ -81,26 +77,21 @@ public class PreSignedUrlService {
             return fail("Invalid Pod selection");
         }
 
-        // ③ JWT
         String jwt = jwtGenerator.generateTokenWithContainerInfo(
-                user,
-                sel.getPodName(),
-                sel.getPodNamespace(),
-                sel.getIngressUrl()
-        );
-        // ④ Pre-Signed URL
+                user, sel.getPodName(), sel.getPodNamespace(), sel.getIngressUrl());
+
         PodInfo pod = new PodInfo(sel.getPodName(),
                 sel.getPodNamespace(),
                 sel.getIngressUrl());
 
         String url = urlBuilder.build(preSignedUrlConfig, jwt, pod);
 
+        log.info("Existing PresignedURL generated for user={} podName={} namespace={} -> {}",
+                user.getEmail(), pod.getPodName(), pod.getPodNamespace(), url);
+
         return new PreSignedUrlResponseDto(url, "Pre-signed URL generated for existing Pod");
     }
 
-    /* ─────────────────────────────────────────────
-     *  3) 실패 응답 헬퍼
-     * ───────────────────────────────────────────── */
     private PreSignedUrlResponseDto fail(String msg) {
         return new PreSignedUrlResponseDto("", msg);
     }

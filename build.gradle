@@ -25,36 +25,46 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
-	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'com.mysql:mysql-connector-j'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
+
+	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// DB
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'com.mysql:mysql-connector-j'   // 최신 메타 패키지
+
+	// Swagger UI (springdoc)
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0' // 3.4.x 호환 권장 버전
+
+	// JWT (권장 스코프 구성)
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+	runtimeOnly   'io.jsonwebtoken:jjwt-impl:0.12.6'
+	runtimeOnly   'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+	// Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// Mail / Thymeleaf
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+	// 기타
+	implementation 'io.github.cdimascio:dotenv-java:2.2.0'
+	implementation 'net.nurigo:sdk:4.3.2'  // coolsms
+
+	// (선택) 헬스체크/모니터링
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.4'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	implementation 'io.github.cdimascio:dotenv-java:2.2.0'
-	implementation 'org.springframework.boot:spring-boot-starter-security' /* Spring security */
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
-	implementation 'org.springframework.boot:spring-boot-starter-validation' // 검증셋
-
-
-	//JWT
-	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
-	implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
-	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.6'
-
-	//redis
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
-	//coolsms
-	implementation 'net.nurigo:sdk:4.3.2'
-
-	implementation 'org.springframework.boot:spring-boot-starter-mail' //mail service
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 }
 
 tasks.named('test') {

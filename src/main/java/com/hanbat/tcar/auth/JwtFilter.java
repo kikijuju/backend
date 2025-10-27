@@ -3,17 +3,16 @@ package com.hanbat.tcar.auth;
 import com.hanbat.tcar.auth.jwt.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
 
-public class JwtFilter extends GenericFilterBean {
+public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
 
@@ -21,34 +20,32 @@ public class JwtFilter extends GenericFilterBean {
         this.jwtProvider = jwtProvider;
     }
 
-
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain chain) throws ServletException, IOException {
 
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        String authHeader = httpRequest.getHeader("Authorization");
+        String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
 
-            // 2) 토큰 유효성 검증
-            if (token != null && jwtProvider.validateToken(token)) {
-                String email = jwtProvider.getEmailFromToken(token);
+            boolean ok = jwtProvider.validateToken(token);
+            logger.info("JWT header ok, validated=" + ok);
 
-                // 인증 객체 생성
+            if (ok) {
+                String email = jwtProvider.getEmailFromToken(token);
+                logger.info("JWT subject(email)=" + email);
+
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
-                                email,  // principal
-                                null,   // credentials
-                                Collections.emptyList() // 권한 정보
+                                email,
+                                null,
+                                Collections.emptyList()
                         );
-
-                // SecurityContextHolder에 인증 정보 설정
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
-        // 3) 다음 필터로 진행
+
         chain.doFilter(request, response);
     }
 }

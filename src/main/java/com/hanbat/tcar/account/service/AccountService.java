@@ -2,7 +2,7 @@ package com.hanbat.tcar.account.service;
 
 import com.hanbat.tcar.account.dto.AccountUpdateRequestDto;
 import com.hanbat.tcar.account.dto.PasswordChangeRequestDto;
-import com.hanbat.tcar.auth.service.RefreshTokenService;
+import com.hanbat.tcar.auth.service.RedisRefreshTokenService;
 import com.hanbat.tcar.user.UserRepository;
 import com.hanbat.tcar.user.service.UserService;
 import com.hanbat.tcar.user.entity.User;
@@ -19,7 +19,7 @@ public class AccountService {
 
     private final UserRepository userRepository;
     private final UserService userService;
-    private final RefreshTokenService refreshTokenService;
+    private final RedisRefreshTokenService refreshTokenService;
     private final PasswordEncoder passwordEncoder;
 
     // 회원탈퇴 기능

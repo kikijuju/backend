@@ -7,5 +7,6 @@ import lombok.Data;
 @Data
 public class JWToken {
     private String accessToken;
+    private long accessTokenExpiresIn; // ★ 추가 (초 단위)
     private String refreshToken;
 }

@@ -11,61 +11,82 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Variable 방식:
- *   • AccessToken / RefreshToken  → JSON 페이로드
- *   • RefreshToken               → Redis 로 관리
- */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
     private final JwtGenerator jwtGenerator;
-    // private final RefreshTokenService refreshTokenService;
     private final UserService userService;
 
-    /* 1) 로그인 ─────────────────────────────────────────────── */
-    public JWToken login(UserLoginRequestDto dto) {
+    // ★ Redis 등을 사용하는 실제 구현체를 빈으로 주입하세요.
+    private final RedisRefreshTokenService refreshTokenService;
 
-        User user = userService.userFind(dto);              // 이메일·비번 검증
-        JWToken token = jwtGenerator.generateToken(user);   // Access / Refresh 생성
+    /**
+     * 로그인: 유저 검증 → Access/Refresh 발급 → Refresh 저장(7일) → 결과 리턴
+     * 컨트롤러에서 Access는 JSON, Refresh는 HttpOnly 쿠키로 내려줌
+     */
+    public LoginResult loginAndIssue(UserLoginRequestDto dto) {
+        User user = userService.userFind(dto);            // 이메일/비번 검증 (예외 던짐)
+        JWToken token = jwtGenerator.generateToken(user); // Access + Refresh 생성
 
-        // RefreshToken → Redis (7일)
-       // refreshTokenService.storeRefreshToken(
-       //         user.getId(),
-       //         token.getRefreshToken(),
-        //        7L);
+        // RefreshToken → Redis 저장 (TTL: 7일)
+        refreshTokenService.storeRefreshToken(user.getId(), token.getRefreshToken(), 7L);
 
-        return token;                                       // ★ JSON 그대로 반환
+        return new LoginResult(
+                token.getAccessToken(),
+                token.getAccessTokenExpiresIn(),
+                token.getRefreshToken(),
+                refreshTokenService.getTtlSeconds(token.getRefreshToken()),
+                user
+        );
     }
 
-    /* 2) AccessToken 재발급 ───────────────────────────────────
-    public JWToken refreshToken(String refreshToken) {
+    /**
+     * Access 재발급: 쿠키에서 받은 refreshToken 검증 → Access 새로 생성
+     * (권장) Refresh 로테이션: 구 토큰 삭제 후 신 토큰 저장
+     */
+    public AccessIssue reissueAccessToken(String refreshToken) {
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "refresh missing");
+        }
 
         Long uid = refreshTokenService.getUserIdByRefreshToken(refreshToken);
-        if (uid == null)
+        if (uid == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid refresh");
+        }
 
         User user = userRepository.findById(uid).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "user not found"));
+                () -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "user not found")
+        );
 
         JWToken newToken = jwtGenerator.generateToken(user);
 
-        // (선택) RefreshToken도 갱신·연장
-        refreshTokenService.storeRefreshToken(
-                uid,
+        // Refresh 로테이션 (보안 권장)
+        refreshTokenService.deleteRefreshToken(refreshToken);
+        refreshTokenService.storeRefreshToken(uid, newToken.getRefreshToken(), 7L);
+
+        return new AccessIssue(
+                newToken.getAccessToken(),
+                newToken.getAccessTokenExpiresIn(),
                 newToken.getRefreshToken(),
-                7L);
-
-        return newToken;
+                refreshTokenService.getTtlSeconds(newToken.getRefreshToken())
+        );
     }
-    3) 로그아웃 ─────────────────────────────────────────────
+
+    /**
+     * 로그아웃: refreshToken 제거
+     */
     public void logout(String refreshToken) {
-        if (refreshToken != null)
-            refreshTokenService.deleteRefreshToken(refreshToken); // Redis 삭제
+        if (refreshToken != null && !refreshToken.isBlank()) {
+            refreshTokenService.deleteRefreshToken(refreshToken);
+        }
     }
-    */
 
+    // --- 서비스 내부 응답 DTO (record) ---
+    public record LoginResult(String accessToken, long accessTokenExpiresIn,
+                              String refreshToken, long refreshTtlSeconds, User user) {}
 
+    public record AccessIssue(String accessToken, long accessTokenExpiresIn,
+                              String rotatedRefreshToken, long refreshTtlSeconds) {}
 }

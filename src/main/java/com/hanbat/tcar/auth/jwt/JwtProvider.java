@@ -28,6 +28,8 @@ public class JwtProvider {
             return true;  // 유효한 토큰
         } catch (ExpiredJwtException e) {
             System.out.println("JWT 만료됨");
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            System.out.println("서명 불일치(키 다름)");
         } catch (MalformedJwtException e) {
             System.out.println("JWT 형식 오류");
         } catch (Exception e) {
