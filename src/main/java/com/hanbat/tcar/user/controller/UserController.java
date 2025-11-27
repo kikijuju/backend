@@ -46,6 +46,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new UserRoleResponseDto("User not found"));
         }
-        return ResponseEntity.ok(new UserRoleResponseDto(userOpt.get().getRole().name()));
+        return ResponseEntity.ok(new UserRoleResponseDto(userOpt.get().getTier().name()));
     }
 }

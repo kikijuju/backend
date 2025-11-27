@@ -3,9 +3,17 @@ package com.hanbat.tcar.pod.controller;
 import com.hanbat.tcar.pod.dto.*;
 import com.hanbat.tcar.pod.entity.PodListInfoDto;
 import com.hanbat.tcar.pod.service.ExternalPodService;
+import com.hanbat.tcar.pod.service.OsOptionService;
 import com.hanbat.tcar.pod.service.PodQueryService;
 import com.hanbat.tcar.pod.service.PreSignedUrlService;
 import com.hanbat.tcar.user.dto.SimpleMessageResponseDto;
+import com.hanbat.tcar.user.entity.User;
+import com.hanbat.tcar.user.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,11 +27,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/container")
 @RequiredArgsConstructor
+
+@Tag(name = "Container", description = "컨테이너(가상 서버) 생성 · 조회 · 삭제 및 OS 옵션 API")
 public class ServerController {
 
     private final PreSignedUrlService preSignedUrlService;
     private final ExternalPodService externalPodService;
     private final PodQueryService podQueryService;
+    private final UserService userService;
+    private final OsOptionService osOptionService;
 
 
     /* ─────────────────────────────────────────────
@@ -40,7 +52,7 @@ public class ServerController {
             PreSignedUrlResponseDto dto = preSignedUrlService.generateForNewContainer(req, email);
 
             HttpStatus status = dto.getPreSignedUrl().isEmpty()
-                    ? HttpStatus.INTERNAL_SERVER_ERROR
+                    ? HttpStatus.BAD_REQUEST
                     : HttpStatus.CREATED;
             return new ResponseEntity<>(dto, status);
         });
@@ -105,6 +117,29 @@ public class ServerController {
                     ? ResponseEntity.ok(msg("Container deleted successfully"))
                     : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(msg("Container deletion failed"));
+        });
+    }
+    @Operation(
+            summary = "등급별 생성 가능 OS/버전 목록 조회",
+            description = """
+                    현재 로그인한 사용자의 등급(BASIC / PRO / ENTERPRISE / ADMIN)에 따라
+                    생성 가능한 OS와 버전 목록을 반환합니다.
+                    프론트에서는 이 응답을 기반으로 OS 선택 드롭다운을 구성하면 됩니다.
+                    """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 필요 (JWT 없음 또는 만료)")
+    })
+    @ApiResponse(responseCode = "200", description = "성공적으로 OS 옵션 목록을 반환함")
+    @GetMapping("/os-options")
+    public ResponseEntity<List<OsOptionResponseDto>> getOsOptions(Authentication auth) {
+        return withAuth(auth, email -> {
+            User user = userService.findByEmail(email)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+            List<OsOptionResponseDto> body = osOptionService.getOptionsForUser(user);
+            return ResponseEntity.ok(body);
         });
     }
 

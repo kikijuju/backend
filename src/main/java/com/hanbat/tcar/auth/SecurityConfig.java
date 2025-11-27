@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // ★ 개별 경로 나열 말고, 와일드카드로 허용 (누락 방지)
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/auth/**",
                                 "/api/users/signup",
                                 "/v3/api-docs/**", "/swagger-ui/**", "/actuator/**", "/error").permitAll()

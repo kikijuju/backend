@@ -41,7 +41,7 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'   // 최신 메타 패키지
 
 	// Swagger UI (springdoc)
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0' // 3.4.x 호환 권장 버전
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
 	// JWT (권장 스코프 구성)
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'

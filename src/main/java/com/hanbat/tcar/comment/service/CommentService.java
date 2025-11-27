@@ -118,7 +118,7 @@ public class CommentService {
                 .orElseThrow(() -> new EntityNotFoundException("댓글이 존재하지 않습니다."));
 
         if (!comment.getAuthor().getId().equals(user.getId()) &&
-                !user.getRole().name().equals("ADMIN")) {
+                !user.getTier().name().equals("ADMIN")) {
             throw new SecurityException("본인 또는 관리자만 삭제할 수 있습니다.");
         }
 

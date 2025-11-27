@@ -4,7 +4,7 @@ import com.hanbat.tcar.user.UserRepository;
 import com.hanbat.tcar.user.dto.UserLoginRequestDto;
 import com.hanbat.tcar.user.dto.UserSignupRequestDto;
 import com.hanbat.tcar.user.entity.User;
-import com.hanbat.tcar.user.entity.UserRole;
+import com.hanbat.tcar.user.entity.UserTier;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -50,7 +50,7 @@ public class UserService {
                 .phoneNumber(userSignupRequestDto.getPhoneNumber())
                 .birthDate(userSignupRequestDto.getBirthDate())  // LocalDate 타입이어야 함
                 .gender(userSignupRequestDto.getGender())        // Gender enum 값
-                .role(UserRole.BASIC)
+                .tier(UserTier.BASIC)
                 .build();
 
         userRepository.save(user);
@@ -76,8 +76,16 @@ public class UserService {
         return user;
 
     }
+
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    @Transactional
+    public void updateTier(Long userId, UserTier newTier) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setTier(newTier);
     }
 
     // 이메일 검증

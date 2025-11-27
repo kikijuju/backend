@@ -130,7 +130,7 @@ public class PostService {
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
 
         if (!post.getAuthor().getId().equals(currentUser.getId()) &&
-                !currentUser.getRole().name().equals("ADMIN")) {
+                !currentUser.getTier().name().equals("ADMIN")) {
             throw new SecurityException("작성자 또는 관리자만 삭제할 수 있습니다.");
         }
 
@@ -165,7 +165,7 @@ public class PostService {
     // 핀 설정/해제 메서드
     @Transactional
     public void setPinStatus(Long postId, User user, boolean pinned) {
-        if (!user.getRole().name().equals("ADMIN")) {
+        if (!user.getTier().name().equals("ADMIN")) {
             throw new SecurityException("관리자만 핀 설정/해제가 가능합니다.");
         }
 
